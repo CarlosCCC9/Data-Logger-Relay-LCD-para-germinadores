@@ -1,0 +1,44 @@
+#include <SPI.h>        // Include SPI library (needed for the SD card)
+#include <SD.h>         // Include SD library
+
+File dataFile;
+const int sensorPin= A0;
+
+void setup() {
+  // Open serial communications and wait for port to open:
+  Serial.begin(9600);
+  while (!Serial)
+    ; // wait for serial port to connect. Needed for native USB port only
+  Serial.print("Initializing SD card...");
+  if (!SD.begin()) {
+    Serial.println("initialization failed!");
+    while (1);
+  }
+  Serial.println("initialization done.");
+  delay(2000);
+}
+
+void loop() {
+  int value = analogRead(sensorPin);
+  float millivolts = (value / 1023.0) * 5000;
+  float celsius = millivolts / 10;
+dataFile = SD.open("TempLog.txt", FILE_WRITE);
+   // if the file opened okay, write to it:
+  if (dataFile) {
+    Serial.print(":    Temperature = ");
+    Serial.println(celsius);
+    // Write data to SD card file (DHT11Log.txt)
+    //dataFile.print(line++);
+    dataFile.println(celsius);
+    //dataFile.print("°C,    Humidity = ");
+    //dataFile.print(RH);
+    //dataFile.println("%");
+    dataFile.close();
+    delay(10000);
+    
+  }
+  // if the file didn't open, print an error:
+  else
+    Serial.println("error opening DHT11Log.txt");
+    delay(10000);
+}
